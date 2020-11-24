@@ -1,13 +1,31 @@
 import pygame
 from utils import make_grid, Node, get_clicked_pos, draw
-from algorithm import aStar_algorithm
-from pygame_widgets import Button, Slider, TextBox
+from algorithm import aStar_algorithm, Dijkstra_algorithm, RoyFloyd_algorithm, bfs
+from pygame_widgets import Button, Slider, TextBox, ButtonArray
+import time
 
 # INIT THE PYGAME WINDOW
 pygame.init()
 WIDTH = 600
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
-pygame.display.set_caption("Visualiser A*")
+pygame.display.set_caption("Path Visualiser")
+chosenAlgo = "A*"
+
+# FUNCTION CHECK THE BUTTON PRESSED FOR CHOSING THE ALGORITHM
+def choseAlgo(x, y):
+	global chosenAlgo
+	if 53<x<192:
+		if 157<y<197:
+			chosenAlgo = "A*"
+		if 204<y<247:
+			chosenAlgo = "Roy-Floyd"
+		if 253<y<290:
+			chosenAlgo = "Dijkstra"
+			print(chosenAlgo)
+		if 300<y<338:
+			chosenAlgo = "BFS"
+	return chosenAlgo
+
 
 # THIS FUNCTION IS THE ACTUAL ALGORITHM VISUALISATION TOOL
 # IT TAKES IN THE WINDOW WIDTH AND THE AMMOUNT OF ROWS ENTERED IN THE MAIN MENU
@@ -15,6 +33,8 @@ pygame.display.set_caption("Visualiser A*")
 def main(win, width, ROWS=30):
 	# initial values are created
 	ROWS = slider.getValue()
+	if ROWS >25 and ROWS % 2 == 0 and ROWS != 40:
+		ROWS += 1
 	grid = make_grid(ROWS, width)
 	start = None
 	end = None
@@ -78,7 +98,18 @@ def main(win, width, ROWS=30):
 						for node in row:
 							node.update_neighbors(grid)
 
-					aStar_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
+					if chosenAlgo == "A*":
+						print(chosenAlgo)
+						aStar_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
+					elif chosenAlgo == "BFS":
+						print(chosenAlgo)
+						bfs(lambda: draw(win, grid, ROWS, width), grid, start, end)
+					elif chosenAlgo == "Dijkstra":
+						print(chosenAlgo)
+						Dijkstra_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
+					else:
+						print(chosenAlgo)
+						RoyFloyd_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
 
 				# if c in pressed than clear the current grid
 				if event.key == pygame.K_c:
@@ -90,22 +121,25 @@ def main(win, width, ROWS=30):
 # THE BUTTON SLIDER AND TEXTBOX ARE ALL FROM THAT LIBRARY
 # I JUST INITIALIZED THEM WITH MY OWN VALLUEs
 button = Button(
-            WIN, 150, 270, 300, 80, text='Generate',
+            WIN, 260, 250, 270, 80, text='Generate',
             fontSize=50, margin=20,
             inactiveColour=(255, 0, 0),
             pressedColour=(0, 255, 0), radius=20,
             onClick=main,
 			onClickParams=(WIN, WIDTH)
         )
-slider = Slider(WIN, 100, 200, 270, 40, 
+slider = Slider(WIN, 250, 180, 180, 40, 
 				min=5, max=40, step=1, 
-				handleColour=(255, 0, 0), handleRadius=25
+				handleColour=(255, 0, 0), handleRadius=22
 			)
-output = TextBox(WIN, 410, 200, 110, 40, fontSize=20)
+output = TextBox(WIN, 460, 180, 110, 40, fontSize=20)
+buttonArray = ButtonArray(WIN, 50, 150, 150, 200, (1, 4),
+                          border=5, texts=('A*', 'Roy-Floyd', 'Dijkstra', 'BFS'), 
+                         )
 
 # THIS PART TAKES CARE OF THE TITLE THAN SHIFTS THE FONT TO NORMAL TEXT
-font = pygame.font.Font('freesansbold.ttf', 64) 
-text = font.render('VISUALISER A*', True, (255, 0, 0)) 
+font = pygame.font.Font('freesansbold.ttf', 56) 
+text = font.render('PATH VISUALISER', True, (255, 0, 0)) 
 textRect = text.get_rect()  
 textRect.center = (300, 50)
 font = pygame.font.Font('freesansbold.ttf', 16) 
@@ -155,6 +189,13 @@ def main_menu(win, width):
 				pygame.quit()
 				run = False
 				quit()
+			if event.type == pygame.MOUSEBUTTONUP:
+				pos = pygame.mouse.get_pos()
+				# 60-192 157-194 A*
+				# 204-247 Roy
+				# 253-290 Dijkstra
+				# 300-338 BFS
+				choseAlgo(pos[0], pos[1])
 
 		# put all the text and color on the screen
 		win.fill((0, 0, 0))
@@ -175,7 +216,8 @@ def main_menu(win, width):
 		slider.draw()
 		output.setText(output_text)
 		output.draw()
-
+		buttonArray.listen(events)
+		buttonArray.draw()
 		pygame.display.update()
 
 

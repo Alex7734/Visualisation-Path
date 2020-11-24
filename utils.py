@@ -155,3 +155,4 @@ def draw(win, grid, rows, width):
 		for node in row:
 			node.draw(win)
 	draw_grid(win, rows, width)
+
