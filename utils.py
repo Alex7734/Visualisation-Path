@@ -4,7 +4,7 @@ import time
 from queue import PriorityQueue
 from pygame_widgets import Button, Slider, TextBox
 
-# THIS IS WHAT EVRY SQUARE OF THE GRID WILL BE
+# THIS IS WHAT EVERY SQUARE OF THE GRID WILL BE
 # BEEING ABLE TO USE AN OBJECT FOR THIS MATTER IS GOOD DUE TO MORE REASONS
 # 1. I CAN INITIALIZE EACH SQUARE WITH ATRIBUTES THAT I WILL ALWAYS NEED
 # 2. I CAN WRITE METHODS THAT CHANGE OR CHECK FOR THE SQUARE'S STATE
@@ -156,3 +156,17 @@ def draw(win, grid, rows, width):
 			node.draw(win)
 	draw_grid(win, rows, width)
 
+# FUNCTION CHECK THE BUTTON PRESSED FOR CHOSING THE ALGORITHM
+def choseAlgo(x, y):
+	global chosenAlgo
+	if 53<x<192:
+		if 157<y<197:
+			chosenAlgo = "A*"
+		if 204<y<247:
+			chosenAlgo = "A*M"
+		if 253<y<290:
+			chosenAlgo = "Dijkstra"
+			print(chosenAlgo)
+		if 300<y<338:
+			chosenAlgo = "DijkstraM"
+	return chosenAlgo

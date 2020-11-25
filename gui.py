@@ -1,6 +1,6 @@
 import pygame
 from utils import make_grid, Node, get_clicked_pos, draw
-from algorithm import aStar_algorithm, Dijkstra_algorithm, RoyFloyd_algorithm, bfs
+from algorithm import aStar_algorithm, Dijkstra_algorithm, generate_walls
 from pygame_widgets import Button, Slider, TextBox, ButtonArray
 import time
 
@@ -18,12 +18,12 @@ def choseAlgo(x, y):
 		if 157<y<197:
 			chosenAlgo = "A*"
 		if 204<y<247:
-			chosenAlgo = "Roy-Floyd"
+			chosenAlgo = "A*M"
 		if 253<y<290:
 			chosenAlgo = "Dijkstra"
 			print(chosenAlgo)
 		if 300<y<338:
-			chosenAlgo = "BFS"
+			chosenAlgo = "DijkstraM"
 	return chosenAlgo
 
 
@@ -39,6 +39,8 @@ def main(win, width, ROWS=30):
 	start = None
 	end = None
 	run = True
+	if chosenAlgo == "A*M" or chosenAlgo == "DijkstraM":
+		generate_walls(lambda:draw(win, grid, ROWS, width), grid, len(grid), start, end)
 	# this while run is here to make the pygame window run untill you close it
 	while run:
 		events = pygame.event.get()
@@ -98,18 +100,11 @@ def main(win, width, ROWS=30):
 						for node in row:
 							node.update_neighbors(grid)
 
-					if chosenAlgo == "A*":
-						print(chosenAlgo)
+					if chosenAlgo == "A*" or chosenAlgo == "A*M":
 						aStar_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
-					elif chosenAlgo == "BFS":
-						print(chosenAlgo)
-						bfs(lambda: draw(win, grid, ROWS, width), grid, start, end)
-					elif chosenAlgo == "Dijkstra":
-						print(chosenAlgo)
+					elif chosenAlgo == "Dijkstra" or chosenAlgo == "DijkstraM":
 						Dijkstra_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
-					else:
-						print(chosenAlgo)
-						RoyFloyd_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
+
 
 				# if c in pressed than clear the current grid
 				if event.key == pygame.K_c:
@@ -134,7 +129,7 @@ slider = Slider(WIN, 250, 180, 180, 40,
 			)
 output = TextBox(WIN, 460, 180, 110, 40, fontSize=20)
 buttonArray = ButtonArray(WIN, 50, 150, 150, 200, (1, 4),
-                          border=5, texts=('A*', 'Roy-Floyd', 'Dijkstra', 'BFS'), 
+                          border=5, texts=('A*', 'A* & Maze', 'Dijkstra', 'Dijkstra & Maze'), 
                          )
 
 # THIS PART TAKES CARE OF THE TITLE THAN SHIFTS THE FONT TO NORMAL TEXT
@@ -191,10 +186,6 @@ def main_menu(win, width):
 				quit()
 			if event.type == pygame.MOUSEBUTTONUP:
 				pos = pygame.mouse.get_pos()
-				# 60-192 157-194 A*
-				# 204-247 Roy
-				# 253-290 Dijkstra
-				# 300-338 BFS
 				choseAlgo(pos[0], pos[1])
 
 		# put all the text and color on the screen

@@ -3,6 +3,15 @@ import time
 import queue
 from queue import PriorityQueue
 from utils import manhattan_distance, Node, reconstruct_path, draw
+import random
+
+def generate_walls(draw, grid, size, start, end):
+	for line in grid:
+		for node in line:
+			if node != start and node != end:
+				if random.randint(0,9)<3:
+					node.make_blocked()
+
 
 # THIS FUNCTION RUNS WHEN YOU PRESS SPACE IN THE VISUALISER 
 # IT IS THE SOUL OF THIS APP AND IS THE ONE RESPONSIBLE FOR RUNNING
@@ -98,6 +107,48 @@ def Dijkstra_algorithm(draw, grid, start, end):
 		
 		# refresh the screen after each iteration
 		pygame.display.update()
+		draw()
+		
+		if current != start:
+			current.make_closed()
+		
+		size = len(grid)
+		if size<11:
+			time.sleep(0.02)
+		elif size<20:
+			time.sleep(0.01)
+		else:
+			time.sleep(0.01)
+	return False
+
+# ;-; does not work
+def bfs(draw, grid, start, end):
+	open_set = queue.Queue()
+	seen = []
+	open_set.put(start)
+	came_from = {}
+	open_set_hash = {start}
+	while not open_set.empty():
+		current = open_set.get()
+		open_set_hash.remove(current)
+		start.make_start()
+		seen.append(current)
+
+		if current == end:
+			end.make_end()
+			reconstruct_path(came_from, end, draw,	len(grid), grid, start)
+			end.make_end()
+			start.make_start()
+			return True
+
+		for neighbor in current.neighbors:
+			if neighbor not in open_set_hash:
+				came_from[neighbor] = current
+				open_set.put(neighbor)
+				open_set_hash.add(neighbor)
+				neighbor.make_open()
+				pygame.display.update()
+
 		size = len(grid)
 		if size<11:
 			time.sleep(0.06)
@@ -107,14 +158,7 @@ def Dijkstra_algorithm(draw, grid, start, end):
 			time.sleep(0.01)
 		draw()
 		
-		if current != start:
+		if current in seen:
 			current.make_closed()
 	
 	return False
-
-
-def RoyFloyd_algorithm(draw, grid, start, end):
-	pass
-
-def bfs(draw, grid, start, end):
-	pass
