@@ -1,6 +1,6 @@
 import pygame
 from utils import make_grid, Node, get_clicked_pos, draw
-from algorithm import aStar_algorithm, Dijkstra_algorithm, generate_walls
+from algorithm import aStar_algorithm, Dijkstra_algorithm, generate_walls, bfs
 from pygame_widgets import Button, Slider, TextBox, ButtonArray
 import time
 
@@ -18,7 +18,7 @@ def choseAlgo(x, y):
 		if 157<y<197:
 			chosenAlgo = "A*"
 		if 204<y<247:
-			chosenAlgo = "A*M"
+			chosenAlgo = "BFS"
 		if 253<y<290:
 			chosenAlgo = "Dijkstra"
 			print(chosenAlgo)
@@ -100,8 +100,10 @@ def main(win, width, ROWS=30):
 						for node in row:
 							node.update_neighbors(grid)
 
-					if chosenAlgo == "A*" or chosenAlgo == "A*M":
+					if chosenAlgo == "A*":
 						aStar_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
+					if chosenAlgo == "BFS":
+						bfs(lambda: draw(win, grid, ROWS, width), grid, start, end)
 					elif chosenAlgo == "Dijkstra" or chosenAlgo == "DijkstraM":
 						Dijkstra_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
 
@@ -129,7 +131,7 @@ slider = Slider(WIN, 250, 180, 180, 40,
 			)
 output = TextBox(WIN, 460, 180, 110, 40, fontSize=20)
 buttonArray = ButtonArray(WIN, 50, 150, 150, 200, (1, 4),
-                          border=5, texts=('A*', 'A* & Maze', 'Dijkstra', 'Dijkstra & Maze'), 
+                          border=5, texts=('A*', 'BFS', 'Dijkstra', 'Dijkstra & Maze'), 
                          )
 
 # THIS PART TAKES CARE OF THE TITLE THAN SHIFTS THE FONT TO NORMAL TEXT
@@ -140,30 +142,31 @@ textRect.center = (300, 50)
 font = pygame.font.Font('freesansbold.ttf', 16) 
 
 # THIS WHOLE BLOCK OF CODE IS JUST THE CONTROLS TEXT IN THE MAIN MENU
-small_text1 = font.render("EXIT visualiser --> back to home screen | SPACE --> run algorithm", True, (0, 0, 255))
+small_text1 = font.render("EXIT visualiser --> back to home screen | SPACE --> run algorithm", True, (255, 0, 0))
 small_textRect1 = small_text1.get_rect()
 small_textRect1.center = (300,450) 
-small_text2 = font.render("LMB --> draw blocks and points | RMB --> delete blocks and points ", True, (0, 0, 255))
+small_text2 = font.render("LMB --> draw blocks and points | RMB --> delete blocks and points ", True, (255, 0, 0))
 small_textRect2 = small_text2.get_rect()
 small_textRect2.center = (300, 475) 
-small_text3 = font.render("MMB --> clear algorithm | c --> hard reset", True, (0, 0, 255))
+small_text3 = font.render("MMB --> clear algorithm | c --> hard reset", True, (255, 0, 0))
 small_textRect3 = small_text3.get_rect()
 small_textRect3.center = (300, 500) 
 
-# THIS BLOCK OF CODE IS JUST THE INFORMATIVE COLORED TEXT AT THE BOTTOM OF THE MAIN MENU PAGE 
-algo_text1 = font.render("START ", True, (255, 165 ,0))
+# THIS BLOCK OF CODE IS JUST THE INFORMATIVE COLORED TEXT AT THE BOTTOM OF THE MAIN MENU PAGE
+font = pygame.font.Font('freesansbold.ttf', 12)  
+algo_text1 = font.render("START", True, (255, 165 ,0))
 algo_textRect1 = algo_text1.get_rect()
-algo_textRect1.center = (100, 575) 
+algo_textRect1.center = (120, 575) 
 algo_text2 = font.render("END", True, (255, 255, 0))
 algo_textRect2 = algo_text2.get_rect()
-algo_textRect2.center = (500, 575) 
-algo_text3 = font.render("BLOCK", True, (125, 125, 125))
+algo_textRect2.center = (480, 575) 
+algo_text3 = font.render("BLOCKED", True, (0, 0, 0))
 algo_textRect3 = algo_text3.get_rect()
 algo_textRect3.center = (300, 575) 
-algo_text4 = font.render("CLOSED", True, (255, 0, 0))
+algo_text4 = font.render("VISITED", True, (255, 0, 0))
 algo_textRect4 = algo_text4.get_rect()
 algo_textRect4.center = (200, 575) 
-algo_text5 = font.render("OPEN", True, (0, 255, 0))
+algo_text5 = font.render("IN QUEUE", True, (0, 255, 0))
 algo_textRect5 = algo_text5.get_rect()
 algo_textRect5.center = (400, 575) 
 
@@ -189,7 +192,7 @@ def main_menu(win, width):
 				choseAlgo(pos[0], pos[1])
 
 		# put all the text and color on the screen
-		win.fill((0, 0, 0))
+		win.fill((50, 50, 50))
 		win.blit(text, textRect)
 		win.blit(algo_text1, algo_textRect1)
 		win.blit(algo_text2, algo_textRect2)
