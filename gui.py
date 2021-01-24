@@ -3,6 +3,8 @@ from utils import make_grid, Node, get_clicked_pos, draw
 from algorithm import aStar_algorithm, Dijkstra_algorithm, generate_walls, bfs
 from pygame_widgets import Button, Slider, TextBox, ButtonArray
 import time
+import webbrowser
+
 
 # INIT THE PYGAME WINDOW
 pygame.init()
@@ -17,13 +19,17 @@ def choseAlgo(x, y):
 	if 53<x<192:
 		if 157<y<197:
 			chosenAlgo = "A*"
+			print(chosenAlgo)
 		if 204<y<247:
 			chosenAlgo = "BFS"
+			print(chosenAlgo)
 		if 253<y<290:
 			chosenAlgo = "Dijkstra"
 			print(chosenAlgo)
 		if 300<y<338:
-			chosenAlgo = "DijkstraM"
+			chosenAlgo = "Github"
+			if chosenAlgo == "Github":
+				webbrowser.open('https://github.com/Alex7734/Visualisation-Path') 
 	return chosenAlgo
 
 
@@ -31,6 +37,7 @@ def choseAlgo(x, y):
 # IT TAKES IN THE WINDOW WIDTH AND THE AMMOUNT OF ROWS ENTERED IN THE MAIN MENU
 # LISTENS FOR ALL THE EVENTS AND CALLS THE ALGORITHM FUNCTION WHEN CONDITIONS ARE MET
 def main(win, width, ROWS=30):
+	global chosenAlgo
 	# initial values are created
 	ROWS = slider.getValue()
 	if ROWS >25 and ROWS % 2 == 0 and ROWS != 40:
@@ -39,8 +46,8 @@ def main(win, width, ROWS=30):
 	start = None
 	end = None
 	run = True
-	if chosenAlgo == "A*M" or chosenAlgo == "DijkstraM":
-		generate_walls(lambda:draw(win, grid, ROWS, width), grid, len(grid), start, end)
+	if chosenAlgo == "Github":
+		choseAlgo = "A*M"
 	# this while run is here to make the pygame window run untill you close it
 	while run:
 		events = pygame.event.get()
@@ -100,7 +107,7 @@ def main(win, width, ROWS=30):
 						for node in row:
 							node.update_neighbors(grid)
 
-					if chosenAlgo == "A*":
+					if chosenAlgo == "A*" or chosenAlgo == "A*M":
 						aStar_algorithm(lambda: draw(win, grid, ROWS, width), grid, start, end)
 					if chosenAlgo == "BFS":
 						bfs(lambda: draw(win, grid, ROWS, width), grid, start, end)
@@ -114,11 +121,14 @@ def main(win, width, ROWS=30):
 					end = None
 					grid = make_grid(ROWS, width)
 
+				if event.key == pygame.K_g:
+					generate_walls(lambda:draw(win, grid, ROWS, width), grid, len(grid), start, end)
+
 # THESE ARE THE PYGAME_WIDGETS MODULE ELEMENTS
 # THE BUTTON SLIDER AND TEXTBOX ARE ALL FROM THAT LIBRARY
 # I JUST INITIALIZED THEM WITH MY OWN VALLUEs
 button = Button(
-            WIN, 260, 250, 270, 80, text='Generate',
+            WIN, 260, 250, 270, 80, text='START',
             fontSize=50, margin=20,
             inactiveColour=(255, 0, 0),
             pressedColour=(0, 255, 0), radius=20,
@@ -131,24 +141,24 @@ slider = Slider(WIN, 250, 180, 180, 40,
 			)
 output = TextBox(WIN, 460, 180, 110, 40, fontSize=20)
 buttonArray = ButtonArray(WIN, 50, 150, 150, 200, (1, 4),
-                          border=5, texts=('A*', 'BFS', 'Dijkstra', 'Dijkstra & Maze'), 
+                          border=5, texts=('A*', 'BFS', 'Dijkstra', 'Github'), 
                          )
 
 # THIS PART TAKES CARE OF THE TITLE THAN SHIFTS THE FONT TO NORMAL TEXT
 font = pygame.font.Font('freesansbold.ttf', 56) 
-text = font.render('PATH VISUALISER', True, (255, 0, 0)) 
+text = font.render('PATH VISUALISER', True, (211,211,211)) 
 textRect = text.get_rect()  
 textRect.center = (300, 50)
 font = pygame.font.Font('freesansbold.ttf', 16) 
 
 # THIS WHOLE BLOCK OF CODE IS JUST THE CONTROLS TEXT IN THE MAIN MENU
-small_text1 = font.render("EXIT visualiser --> back to home screen | SPACE --> run algorithm", True, (255, 0, 0))
+small_text1 = font.render("EXIT visualiser --> back to home screen | SPACE --> run algorithm", True, (211,211,211))
 small_textRect1 = small_text1.get_rect()
 small_textRect1.center = (300,450) 
-small_text2 = font.render("LMB --> draw blocks and points | RMB --> delete blocks and points ", True, (255, 0, 0))
+small_text2 = font.render("LMB --> draw blocks and points | RMB --> delete blocks and points ", True, (211,211,211))
 small_textRect2 = small_text2.get_rect()
 small_textRect2.center = (300, 475) 
-small_text3 = font.render("MMB --> clear algorithm | c --> hard reset", True, (255, 0, 0))
+small_text3 = font.render("MMB --> clear algorithm | c --> hard reset | g --> generate maze", True, (211,211,211))
 small_textRect3 = small_text3.get_rect()
 small_textRect3.center = (300, 500) 
 
